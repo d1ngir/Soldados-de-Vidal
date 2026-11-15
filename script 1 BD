@@ -1,0 +1,77 @@
+CREATE TABLE Usuarios 
+(
+    id_usuario INT IDENTITY(1,1) PRIMARY KEY,
+    nombre_usuario VARCHAR(50) NOT NULL UNIQUE,
+    contrasena VARCHAR(255) NOT NULL,
+    foto VARCHAR(max)
+);
+
+
+CREATE TABLE ChatGeneral 
+(
+    id_mensaje INT IDENTITY(1,1) PRIMARY KEY,
+    id_emisor INT FOREIGN KEY REFERENCES Usuarios(id_usuario),
+    contenido TEXT NOT NULL,
+    fecha DATETIME DEFAULT GETDATE()
+);
+
+
+CREATE TABLE MensajesDirectos 
+(
+    id_mensaje INT IDENTITY(1,1) PRIMARY KEY,
+    id_emisor INT FOREIGN KEY REFERENCES Usuarios(id_usuario),
+    id_receptor INT FOREIGN KEY REFERENCES Usuarios(id_usuario),
+    contenido TEXT NOT NULL,
+    fecha DATETIME DEFAULT GETDATE()
+);
+
+
+CREATE TABLE Grupos 
+(
+    id_grupo INT IDENTITY(1,1) PRIMARY KEY,
+    nombre_grupo VARCHAR(100) NOT NULL,
+    id_creador INT FOREIGN KEY REFERENCES Usuarios(id_usuario)
+);
+
+
+CREATE TABLE MiembrosGrupo 
+(
+    id_grupo INT FOREIGN KEY REFERENCES Grupos(id_grupo),
+    id_usuario INT FOREIGN KEY REFERENCES Usuarios(id_usuario),
+    PRIMARY KEY (id_grupo, id_usuario)
+);
+
+
+CREATE TABLE MensajesGrupo 
+(
+    id_mensaje INT IDENTITY(1,1) PRIMARY KEY,
+    id_grupo INT FOREIGN KEY REFERENCES Grupos(id_grupo),
+    id_emisor INT FOREIGN KEY REFERENCES Usuarios(id_usuario),
+    contenido TEXT NOT NULL,
+    fecha DATETIME DEFAULT GETDATE()
+);
+
+
+CREATE TABLE Canales 
+(
+    id_canal INT IDENTITY(1,1) PRIMARY KEY,
+    nombre_canal VARCHAR(100) NOT NULL,
+    id_propietario INT FOREIGN KEY REFERENCES Usuarios(id_usuario) 
+);
+
+
+CREATE TABLE SuscriptoresCanal 
+(
+    id_canal INT FOREIGN KEY REFERENCES Canales(id_canal),
+    id_usuario INT FOREIGN KEY REFERENCES Usuarios(id_usuario),
+    PRIMARY KEY (id_canal, id_usuario)
+);
+
+
+CREATE TABLE MensajesCanal 
+(
+    id_mensaje INT IDENTITY(1,1) PRIMARY KEY,
+    id_canal INT FOREIGN KEY REFERENCES Canales(id_canal),
+    contenido TEXT NOT NULL,
+    fecha DATETIME DEFAULT GETDATE()
+);
