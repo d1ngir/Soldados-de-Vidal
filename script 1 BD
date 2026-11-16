@@ -5,7 +5,7 @@ CREATE TABLE Usuarios
     contrasena VARCHAR(255) NOT NULL,
     foto VARCHAR(max)
 );
-
+GO
 
 CREATE TABLE ChatGeneral 
 (
@@ -14,7 +14,7 @@ CREATE TABLE ChatGeneral
     contenido TEXT NOT NULL,
     fecha DATETIME DEFAULT GETDATE()
 );
-
+GO
 
 CREATE TABLE MensajesDirectos 
 (
@@ -24,7 +24,7 @@ CREATE TABLE MensajesDirectos
     contenido TEXT NOT NULL,
     fecha DATETIME DEFAULT GETDATE()
 );
-
+GO
 
 CREATE TABLE Grupos 
 (
@@ -32,7 +32,7 @@ CREATE TABLE Grupos
     nombre_grupo VARCHAR(100) NOT NULL,
     id_creador INT FOREIGN KEY REFERENCES Usuarios(id_usuario)
 );
-
+GO
 
 CREATE TABLE MiembrosGrupo 
 (
@@ -40,7 +40,7 @@ CREATE TABLE MiembrosGrupo
     id_usuario INT FOREIGN KEY REFERENCES Usuarios(id_usuario),
     PRIMARY KEY (id_grupo, id_usuario)
 );
-
+GO
 
 CREATE TABLE MensajesGrupo 
 (
@@ -50,7 +50,7 @@ CREATE TABLE MensajesGrupo
     contenido TEXT NOT NULL,
     fecha DATETIME DEFAULT GETDATE()
 );
-
+GO
 
 CREATE TABLE Canales 
 (
@@ -58,7 +58,7 @@ CREATE TABLE Canales
     nombre_canal VARCHAR(100) NOT NULL,
     id_propietario INT FOREIGN KEY REFERENCES Usuarios(id_usuario) 
 );
-
+GO
 
 CREATE TABLE SuscriptoresCanal 
 (
@@ -66,7 +66,7 @@ CREATE TABLE SuscriptoresCanal
     id_usuario INT FOREIGN KEY REFERENCES Usuarios(id_usuario),
     PRIMARY KEY (id_canal, id_usuario)
 );
-
+GO
 
 CREATE TABLE MensajesCanal 
 (
