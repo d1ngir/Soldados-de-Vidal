@@ -75,3 +75,5 @@ CREATE TABLE MensajesCanal
     contenido TEXT NOT NULL,
     fecha DATETIME DEFAULT GETDATE()
 );
+GO
+EXIT
