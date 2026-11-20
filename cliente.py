@@ -8,10 +8,10 @@ from tkinter import scrolledtext, messagebox, simpledialog
 SERVER_IP = '3.149.102.2'
 PORT = 3052
 
-class WasapApp:
+class Wasap:
     def __init__(self, root):
         self.root = root
-        self.root.title("Wasap - Acceso")
+        self.root.title("Wasap - LOGIN")
         self.root.geometry("360x230")
 
         self.id_usuario = None
@@ -61,54 +61,54 @@ class WasapApp:
         self.frame_login.pack(expand=True, fill=tk.BOTH)
 
         tk.Label(self.frame_login, text="Usuario:", font=("Arial", 10, "bold")).pack(anchor="w")
-        self.entry_user = tk.Entry(self.frame_login, width=35)
-        self.entry_user.pack(pady=(2, 10))
+        self.usuario_ingresado = tk.Entry(self.frame_login, width=35)
+        self.usuario_ingresado.pack(pady=(2, 10))
 
         tk.Label(self.frame_login, text="Contraseña:", font=("Arial", 10, "bold")).pack(anchor="w")
-        self.entry_pass = tk.Entry(self.frame_login, show="*", width=35)
-        self.entry_pass.pack(pady=(2, 15))
-        self.entry_pass.bind("<Return>", lambda e: self.hacer_login())
+        self.contrasena_ingresada = tk.Entry(self.frame_login, show="*", width=35)
+        self.contrasena_ingresada.pack(pady=(2, 15))
+        self.contrasena_ingresada.bind("<Return>", lambda e: self.hacer_login())
 
         btn_frame = tk.Frame(self.frame_login)
         btn_frame.pack(pady=5)
-        tk.Button(btn_frame, text="Iniciar Sesión", command=self.hacer_login, width=14, bg="#25D366", fg="white", font=("Arial", 9, "bold")).pack(side=tk.LEFT, padx=6)
+        tk.Button(btn_frame, text="Iniciar Sesión", command=self.hacer_login, width=14, bg="green", fg="white", font=("Arial", 9, "bold")).pack(side=tk.LEFT, padx=6)
         tk.Button(btn_frame, text="Registrarse", command=self.iniciar_flujo_registro, width=14, font=("Arial", 9)).pack(side=tk.RIGHT, padx=6)
 
     def hacer_login(self):
-        u = self.entry_user.get().strip()
-        p = self.entry_pass.get().strip()
+        u = self.usuario_ingresado.get().strip()
+        p = self.contrasena_ingresada.get().strip()
         if not u or not p:
             messagebox.showwarning("Campos vacíos", "Ingresa tu usuario y contraseña.")
             return
         self.enviar_json({"accion": "login", "nombre_usuario": u, "contrasena": p})
 
     def iniciar_flujo_registro(self):
-        u = self.entry_user.get().strip()
-        p = self.entry_pass.get().strip()
+        u = self.usuario_ingresado.get().strip()
+        p = self.contrasena_ingresada.get().strip()
         if not u or not p:
             messagebox.showwarning("Campos vacíos", "Primero escribe el usuario y la contraseña con los que deseas registrarte.")
             return
 
-        modal_pwd = tk.Toplevel(self.root)
-        modal_pwd.title("Confirmar Contraseña")
-        modal_pwd.geometry("320x150")
-        modal_pwd.resizable(False, False)
-        modal_pwd.grab_set()
+        ventana_confirmar_pwd = tk.Toplevel(self.root)
+        ventana_confirmar_pwd.title("Confirmar Contraseña")
+        ventana_confirmar_pwd.geometry("320x150")
+        ventana_confirmar_pwd.resizable(False, False)
+        ventana_confirmar_pwd.grab_set()
 
-        tk.Label(modal_pwd, text="Introduce nuevamente tu contraseña:", font=("Arial", 9, "bold")).pack(pady=(15, 5))
-        entry_confirm = tk.Entry(modal_pwd, show="*", width=30)
-        entry_confirm.pack(pady=5)
-        entry_confirm.focus_set()
+        tk.Label(ventana_confirmar_pwd, text="Introduce nuevamente tu contraseña:", font=("Arial", 9, "bold")).pack(pady=(15, 5))
+        confirmar_contrasena = tk.Entry(ventana_confirmar_pwd, show="*", width=30)
+        confirmar_contrasena.pack(pady=5)
+        confirmar_contrasena.focus_set()
 
         def verificar_pwd():
-            if entry_confirm.get().strip() != p:
-                messagebox.showerror("Error", "Las contraseñas no coinciden.", parent=modal_pwd)
+            if confirmar_contrasena.get().strip() != p:
+                messagebox.showerror("Error", "Las contraseñas no coinciden.", parent=ventana_confirmar_pwd)
                 return
-            modal_pwd.destroy()
+            ventana_confirmar_pwd.destroy()
             self.abrir_selector_avatar(u, p)
 
-        entry_confirm.bind("<Return>", lambda e: verificar_pwd())
-        tk.Button(modal_pwd, text="Continuar", command=verificar_pwd, bg="#25D366", fg="white", width=14).pack(pady=10)
+        confirmar_contrasena.bind("<Return>", lambda e: verificar_pwd())
+        tk.Button(ventana_confirmar_pwd, text="Continuar", command=verificar_pwd, bg="green", fg="white", width=14).pack(pady=10)
 
     def abrir_selector_avatar(self, u, p):
         modal = tk.Toplevel(self.root)
@@ -119,15 +119,15 @@ class WasapApp:
 
         tk.Label(modal, text=f"Selecciona una foto de perfil para '{u}':", font=("Arial", 10, "bold")).pack(pady=(12, 8))
 
-        avatar_var = tk.StringVar(value="1")
-        av_frame = tk.Frame(modal)
-        av_frame.pack(pady=5)
+        numero_avatar = tk.StringVar(value="1")
+        avatar_frame = tk.Frame(modal)
+        avatar_frame.pack(pady=5)
 
         for i in range(1, 7):
-            sid = str(i)
+            id_avatar_tostring = str(i)
             rb = tk.Radiobutton(
-                av_frame, text="", variable=avatar_var, value=sid,
-                image=self.avatares_tk.get(sid), indicatoron=0, width=58, height=58
+                avatar_frame, text="", variable=numero_avatar, value=id_avatar_tostring,
+                image=self.avatares_tk.get(id_avatar_tostring), indicatoron=0, width=58, height=58
             )
             rb.pack(side=tk.LEFT, padx=4)
 
@@ -136,11 +136,11 @@ class WasapApp:
                 "accion": "registro",
                 "nombre_usuario": u,
                 "contrasena": p,
-                "foto": avatar_var.get()
+                "foto": numero_avatar.get()
             })
             modal.destroy()
 
-        tk.Button(modal, text="Confirmar Registro", command=confirmar, bg="#25D366", fg="white", font=("Arial", 9, "bold"), width=18).pack(pady=12)
+        tk.Button(modal, text="Confirmar Registro", command=confirmar, bg="green", fg="black", font=("Arial", 9, "bold"), width=18).pack(pady=12)
 
     # ---------------- INTERFAZ PRINCIPAL ----------------
     def construir_principal(self):
@@ -148,73 +148,73 @@ class WasapApp:
         self.root.title(f"Wasap - {self.nombre_usuario}")
         self.root.geometry("900x540")
 
-        left_panel = tk.Frame(self.root, width=265, bg="#f0f2f5", padx=8, pady=8)
-        left_panel.pack(side=tk.LEFT, fill=tk.Y)
-        left_panel.pack_propagate(False)
+        panel_izquierdo = tk.Frame(self.root, width=265, bg="white", padx=8, pady=8)
+        panel_izquierdo.pack(side=tk.LEFT, fill=tk.Y)
+        panel_izquierdo.pack_propagate(False)
 
-        perfil_frame = tk.Frame(left_panel, bg="#f0f2f5")
+        perfil_frame = tk.Frame(panel_izquierdo, bg="white")
         perfil_frame.pack(fill=tk.X, pady=(0, 8))
         if self.foto_id in self.avatares_tk:
-            tk.Label(perfil_frame, image=self.avatares_tk[self.foto_id], bg="#f0f2f5").pack(side=tk.LEFT, padx=(0, 8))
-        tk.Label(perfil_frame, text=f"{self.nombre_usuario}\n🟢 En línea", font=("Arial", 10, "bold"), bg="#f0f2f5", justify=tk.LEFT).pack(side=tk.LEFT)
+            tk.Label(perfil_frame, image=self.avatares_tk[self.foto_id], bg="white").pack(side=tk.LEFT, padx=(0, 8))
+        tk.Label(perfil_frame, text=f"{self.nombre_usuario}\nEn línea", font=("Arial", 10, "bold"), bg="white", justify=tk.LEFT).pack(side=tk.LEFT)
 
-        tk.Button(left_panel, text="🌐 Chat General", command=lambda: self.seleccionar_chat("general", 0, "🌐 Chat General"), anchor="w", bg="#d9fdd3").pack(fill=tk.X, pady=3)
+        tk.Button(panel_izquierdo, text="Chat General", command=lambda: self.seleccionar_chat("general", 0, "Chat General"), anchor="w", bg="green", fg="white").pack(fill=tk.X, pady=3)
 
-        tk.Label(left_panel, text="💬 Mensajes Directos", font=("Arial", 9, "bold"), bg="#f0f2f5").pack(anchor="w", pady=(8, 2))
-        self.list_usuarios = tk.Listbox(left_panel, height=6, font=("Consolas", 9))
-        self.list_usuarios.pack(fill=tk.X)
-        self.list_usuarios.bind("<<ListboxSelect>>", self.al_elegir_usuario)
+        tk.Label(panel_izquierdo, text="Mensajes Directos", font=("Arial", 9, "bold"), bg="white").pack(anchor="w", pady=(8, 2))
+        self.lista_usuarios = tk.Listbox(panel_izquierdo, height=6, font=("Consolas", 9))
+        self.lista_usuarios.pack(fill=tk.X)
+        self.lista_usuarios.bind("<<ListboxSelect>>", self.al_elegir_usuario)
 
-        grp_hdr = tk.Frame(left_panel, bg="#f0f2f5")
+        grp_hdr = tk.Frame(panel_izquierdo, bg="white")
         grp_hdr.pack(fill=tk.X, pady=(8, 2))
-        tk.Label(grp_hdr, text="👥 Grupos", font=("Arial", 9, "bold"), bg="#f0f2f5").pack(side=tk.LEFT)
+        tk.Label(grp_hdr, text="Grupos", font=("Arial", 9, "bold"), bg="white").pack(side=tk.LEFT)
         tk.Button(grp_hdr, text="+ Crear", font=("Arial", 8), command=self.dialogo_crear_grupo).pack(side=tk.RIGHT)
 
-        self.list_grupos = tk.Listbox(left_panel, height=4)
-        self.list_grupos.pack(fill=tk.X)
-        self.list_grupos.bind("<<ListboxSelect>>", self.al_elegir_grupo)
+        self.lista_grupos = tk.Listbox(panel_izquierdo, height=4)
+        self.lista_grupos.pack(fill=tk.X)
+        self.lista_grupos.bind("<<ListboxSelect>>", self.al_elegir_grupo)
 
-        can_hdr = tk.Frame(left_panel, bg="#f0f2f5")
+        can_hdr = tk.Frame(panel_izquierdo, bg="white")
         can_hdr.pack(fill=tk.X, pady=(8, 2))
-        tk.Label(can_hdr, text="📢 Canales", font=("Arial", 9, "bold"), bg="#f0f2f5").pack(side=tk.LEFT)
+        tk.Label(can_hdr, text="Canales", font=("Arial", 9, "bold"), bg="white").pack(side=tk.LEFT)
         tk.Button(can_hdr, text="+ Crear", font=("Arial", 8), command=self.dialogo_crear_canal).pack(side=tk.RIGHT)
 
-        self.list_canales = tk.Listbox(left_panel, height=4)
-        self.list_canales.pack(fill=tk.X)
-        self.list_canales.bind("<<ListboxSelect>>", self.al_elegir_canal)
+        self.lista_canales = tk.Listbox(panel_izquierdo, height=4)
+        self.lista_canales.pack(fill=tk.X)
+        self.lista_canales.bind("<<ListboxSelect>>", self.al_elegir_canal)
 
-        right_panel = tk.Frame(self.root, padx=10, pady=10)
-        right_panel.pack(side=tk.RIGHT, expand=True, fill=tk.BOTH)
+        panel_derecho = tk.Frame(self.root, padx=10, pady=10)
+        panel_derecho.pack(side=tk.RIGHT, expand=True, fill=tk.BOTH)
 
-        header_chat = tk.Frame(right_panel)
-        header_chat.pack(fill=tk.X, pady=(0, 5))
+        encabezado_chat = tk.Frame(panel_derecho)
+        encabezado_chat.pack(fill=tk.X, pady=(0, 5))
 
-        title_box = tk.Frame(header_chat)
-        title_box.pack(side=tk.LEFT, fill=tk.X, expand=True)
-        self.lbl_titulo_chat = tk.Label(title_box, text="🌐 Chat General", font=("Arial", 12, "bold"), anchor="w")
+        titulo_frame = tk.Frame(encabezado_chat)
+        titulo_frame.pack(side=tk.LEFT, fill=tk.X, expand=True)
+        self.lbl_titulo_chat = tk.Label(titulo_frame, text="Chat General", font=("Arial", 12, "bold"), anchor="w")
         self.lbl_titulo_chat.pack(anchor="w")
-        self.lbl_subtitulo_chat = tk.Label(title_box, text="", font=("Arial", 8, "italic"), fg="#555555", anchor="w")
+        self.lbl_subtitulo_chat = tk.Label(titulo_frame, text="", font=("Arial", 8, "italic"), fg="black", anchor="w")
         self.lbl_subtitulo_chat.pack(anchor="w")
 
-        self.acciones_chat_frame = tk.Frame(header_chat)
+        self.acciones_chat_frame = tk.Frame(encabezado_chat)
         self.acciones_chat_frame.pack(side=tk.RIGHT)
 
-        self.chat_area = scrolledtext.ScrolledText(right_panel, wrap=tk.WORD, state='disabled')
+        self.chat_area = scrolledtext.ScrolledText(panel_derecho, wrap=tk.WORD, state='disabled')
         self.chat_area.pack(expand=True, fill=tk.BOTH)
 
-        bottom = tk.Frame(right_panel)
-        bottom.pack(fill=tk.X, pady=(8, 0))
-        self.msg_entry = tk.Entry(bottom)
-        self.msg_entry.pack(side=tk.LEFT, expand=True, fill=tk.X, padx=(0, 5))
-        self.msg_entry.bind("<Return>", lambda e: self.enviar_mensaje())
-        self.btn_enviar = tk.Button(bottom, text="Enviar", command=self.enviar_mensaje, width=10, bg="#25D366", fg="white")
+        boton = tk.Frame(panel_derecho)
+        boton.pack(fill=tk.X, pady=(8, 0))
+        self.introducir_mensaje = tk.Entry(boton)
+        self.introducir_mensaje.pack(side=tk.LEFT, expand=True, fill=tk.X, padx=(0, 5))
+        self.introducir_mensaje.bind("<Return>", lambda e: self.enviar_mensaje())
+        self.btn_enviar = tk.Button(boton, text="Enviar", command=self.enviar_mensaje, width=10, bg="green", fg="white")
         self.btn_enviar.pack(side=tk.RIGHT)
 
-        self.actualizar_listboxes()
-        self.seleccionar_chat("general", 0, "🌐 Chat General")
+        self.actualizar_listas()
+        self.seleccionar_chat("general", 0, "Chat General")
 
-    def actualizar_listboxes(self):
-        self.list_usuarios.delete(0, tk.END)
+    def actualizar_listas(self):
+        self.lista_usuarios.delete(0, tk.END)
         for u in self.usuarios:
             if u["id"] != self.id_usuario:
                 estado_ico = "🟢" if u.get("activo") else "⚪"
@@ -223,16 +223,16 @@ class WasapApp:
                     nombre_fmt = f"{estado_ico} @{u['nombre']:<14} {pendientes}"
                 else:
                     nombre_fmt = f"{estado_ico} @{u['nombre']}"
-                self.list_usuarios.insert(tk.END, nombre_fmt)
+                self.lista_usuarios.insert(tk.END, nombre_fmt)
 
-        self.list_grupos.delete(0, tk.END)
+        self.lista_grupos.delete(0, tk.END)
         for g in self.grupos:
-            self.list_grupos.insert(tk.END, f"# {g['nombre']}")
+            self.lista_grupos.insert(tk.END, f"# {g['nombre']}")
 
-        self.list_canales.delete(0, tk.END)
+        self.lista_canales.delete(0, tk.END)
         for c in self.canales:
             estado = "✓" if c["suscrito"] else "+ Unirse:"
-            self.list_canales.insert(tk.END, f"{estado} {c['nombre']}")
+            self.lista_canales.insert(tk.END, f"{estado} {c['nombre']}")
 
     def limpiar_botones_contextuales(self):
         for w in self.acciones_chat_frame.winfo_children():
@@ -246,29 +246,29 @@ class WasapApp:
 
         if tipo == "directo" and id_obj in self.no_leidos_dm:
             self.no_leidos_dm.pop(id_obj, None)
-            self.actualizar_listboxes()
+            self.actualizar_listas()
 
         elif tipo == "grupo":
             g = next((x for x in self.grupos if x["id"] == id_obj), None)
             if g:
-                tk.Button(self.acciones_chat_frame, text="Ver miembros", font=("Arial", 8), bg="#e7f3ff",
+                tk.Button(self.acciones_chat_frame, text="Ver miembros", font=("Arial", 8), bg="blue", fg="white",
                           command=lambda: self.enviar_json({"accion": "ver_miembros_grupo", "id_grupo": id_obj})).pack(side=tk.LEFT, padx=2)
                 if g["creador_id"] == self.id_usuario:
-                    tk.Button(self.acciones_chat_frame, text="+ Agregar", font=("Arial", 8), bg="#d9fdd3",
+                    tk.Button(self.acciones_chat_frame, text="+ Agregar", font=("Arial", 8), bg="green", fg="white",
                               command=lambda: self.enviar_json({"accion": "obtener_candidatos_grupo", "id_grupo": id_obj, "modo": "agregar"})).pack(side=tk.LEFT, padx=2)
-                    tk.Button(self.acciones_chat_frame, text="Eliminar", font=("Arial", 8), bg="#ffdddd",
+                    tk.Button(self.acciones_chat_frame, text="Eliminar", font=("Arial", 8), bg="red", fg="white",
                               command=lambda: self.enviar_json({"accion": "obtener_candidatos_grupo", "id_grupo": id_obj, "modo": "eliminar"})).pack(side=tk.LEFT, padx=2)
-                tk.Button(self.acciones_chat_frame, text="Salir", font=("Arial", 8), bg="#eeeeee",
+                tk.Button(self.acciones_chat_frame, text="Salir", font=("Arial", 8), bg="white", fg="black",
                           command=lambda: self.salir_de_grupo(id_obj)).pack(side=tk.LEFT, padx=2)
 
         elif tipo == "canal":
             c = next((x for x in self.canales if x["id"] == id_obj), None)
             if c:
                 if c["propietario"] == self.id_usuario:
-                    tk.Button(self.acciones_chat_frame, text="Eliminar canal", font=("Arial", 8), bg="#ffdddd",
+                    tk.Button(self.acciones_chat_frame, text="Eliminar canal", font=("Arial", 8), bg="red", fg="white",
                               command=lambda: self.eliminar_canal(id_obj)).pack(side=tk.LEFT, padx=2)
                 else:
-                    tk.Button(self.acciones_chat_frame, text="Dejar de seguir", font=("Arial", 8), bg="#ffdddd",
+                    tk.Button(self.acciones_chat_frame, text="Dejar de seguir", font=("Arial", 8), bg="red", fg="white",
                               command=lambda: self.dejar_de_seguir_canal(id_obj)).pack(side=tk.LEFT, padx=2)
 
         self.chat_area.config(state='normal')
@@ -276,27 +276,27 @@ class WasapApp:
         self.chat_area.config(state='disabled')
 
         estado_input = 'disabled' if solo_lectura else 'normal'
-        self.msg_entry.config(state=estado_input)
+        self.introducir_mensaje.config(state=estado_input)
         self.btn_enviar.config(state=estado_input)
 
         self.enviar_json({"accion": "cargar_chat", "tipo": tipo, "id_objetivo": id_obj})
 
     def al_elegir_usuario(self, event):
-        sel = self.list_usuarios.curselection()
+        sel = self.lista_usuarios.curselection()
         if not sel: return
         otros = [u for u in self.usuarios if u["id"] != self.id_usuario]
         u = otros[sel[0]]
         estado = "En línea" if u.get("activo") else "Desconectado"
-        self.seleccionar_chat("directo", u["id"], f"💬 Privado con {u['nombre']}", subtitulo=estado)
+        self.seleccionar_chat("directo", u["id"], f"Privado con {u['nombre']}", subtitulo=estado)
 
     def al_elegir_grupo(self, event):
-        sel = self.list_grupos.curselection()
+        sel = self.lista_grupos.curselection()
         if not sel: return
         g = self.grupos[sel[0]]
-        self.seleccionar_chat("grupo", g["id"], f"👥 {g['nombre']}", subtitulo=f"Grupo de {g['creador_nombre']}")
+        self.seleccionar_chat("grupo", g["id"], f"{g['nombre']}", subtitulo=f"Grupo de {g['creador_nombre']}")
 
     def al_elegir_canal(self, event):
-        sel = self.list_canales.curselection()
+        sel = self.lista_canales.curselection()
         if not sel: return
         c = self.canales[sel[0]]
         if not c["suscrito"]:
@@ -304,7 +304,7 @@ class WasapApp:
                 self.enviar_json({"accion": "suscribir_canal", "id_canal": c["id"]})
             return
         es_dueno = (c["propietario"] == self.id_usuario)
-        self.seleccionar_chat("canal", c["id"], f"📢 {c['nombre']}", subtitulo=f"Canal de {c['propietario_nombre']}", solo_lectura=not es_dueno)
+        self.seleccionar_chat("canal", c["id"], f"{c['nombre']}", subtitulo=f"Canal de {c['propietario_nombre']}", solo_lectura=not es_dueno)
 
     # ---------------- MODALES CON SELECCIÓN MÚLTIPLE ----------------
     def dialogo_crear_grupo(self):
@@ -335,7 +335,7 @@ class WasapApp:
             self.enviar_json({"accion": "crear_grupo", "nombre": nombre, "miembros": seleccionados})
             modal.destroy()
 
-        tk.Button(modal, text="Crear Grupo", command=confirmar, bg="#25D366", fg="white", font=("Arial", 9, "bold"), width=15).pack(pady=10)
+        tk.Button(modal, text="Crear Grupo", command=confirmar, bg="green", fg="white", font=("Arial", 9, "bold"), width=15).pack(pady=10)
 
     def abrir_selector_miembros_grupo(self, id_grupo, modo, lista_usuarios):
         if not lista_usuarios:
@@ -367,13 +367,13 @@ class WasapApp:
             modal.destroy()
 
         btn_txt = "Agregar seleccionados" if modo == "agregar" else "Eliminar seleccionados"
-        btn_col = "#25D366" if modo == "agregar" else "#d9534f"
+        btn_col = "green" if modo == "agregar" else "red"
         tk.Button(modal, text=btn_txt, command=confirmar, bg=btn_col, fg="white", font=("Arial", 9, "bold"), width=20).pack(pady=10)
 
     def salir_de_grupo(self, id_grupo):
         if messagebox.askyesno("Salir", "¿Seguro que quieres salir de este grupo?"):
             self.enviar_json({"accion": "salir_grupo", "id_grupo": id_grupo})
-            self.seleccionar_chat("general", 0, "🌐 Chat General")
+            self.seleccionar_chat("general", 0, "Chat General")
 
     def dialogo_crear_canal(self):
         nombre = simpledialog.askstring("Nuevo Canal", "Nombre del canal de difusión:")
@@ -383,12 +383,12 @@ class WasapApp:
     def eliminar_canal(self, id_canal):
         if messagebox.askyesno("Eliminar Canal", "¿Seguro que deseas eliminar este canal permanentemente para todos?"):
             self.enviar_json({"accion": "eliminar_canal", "id_canal": id_canal})
-            self.seleccionar_chat("general", 0, "🌐 Chat General")
+            self.seleccionar_chat("general", 0, "Chat General")
 
     def dejar_de_seguir_canal(self, id_canal):
         if messagebox.askyesno("Canal", "¿Deseas dejar de seguir este canal?"):
             self.enviar_json({"accion": "desuscribir_canal", "id_canal": id_canal})
-            self.seleccionar_chat("general", 0, "🌐 Chat General")
+            self.seleccionar_chat("general", 0, "Chat General")
 
     def mostrar_modal_miembros(self, miembros):
         modal = tk.Toplevel(self.root)
@@ -408,11 +408,11 @@ class WasapApp:
         tk.Button(modal, text="Cerrar", command=modal.destroy, width=12).pack(pady=8)
 
     def enviar_mensaje(self):
-        txt = self.msg_entry.get().strip()
+        txt = self.introducir_mensaje.get().strip()
         if txt:
             tipo, id_obj = self.chat_actual
             self.enviar_json({"accion": "enviar_mensaje", "tipo": tipo, "id_objetivo": id_obj, "contenido": txt})
-            self.msg_entry.delete(0, tk.END)
+            self.introducir_mensaje.delete(0, tk.END)
 
     def insertar_mensaje_ui(self, m):
         self.chat_area.config(state='normal')
@@ -476,12 +476,12 @@ class WasapApp:
             self.grupos = res["grupos"]
             self.canales = res["canales"]
             def refrescar_vista():
-                self.actualizar_listboxes()
+                self.actualizar_listas()
                 tipo, id_obj = self.chat_actual
                 if tipo == "grupo" and not any(g["id"] == id_obj for g in self.grupos):
-                    self.seleccionar_chat("general", 0, "🌐 Chat General")
+                    self.seleccionar_chat("general", 0, "Chat General")
                 elif tipo == "canal" and not any(c["id"] == id_obj for c in self.canales):
-                    self.seleccionar_chat("general", 0, "🌐 Chat General")
+                    self.seleccionar_chat("general", 0, "Chat General")
                 elif tipo == "directo":
                     u = next((x for x in self.usuarios if x["id"] == id_obj), None)
                     if u:
@@ -501,9 +501,9 @@ class WasapApp:
             elif res["tipo"] == "directo":
                 remitente_id = res["id_objetivo"]
                 self.no_leidos_dm[remitente_id] = self.no_leidos_dm.get(remitente_id, 0) + 1
-                self.root.after(0, self.actualizar_listboxes)
+                self.root.after(0, self.actualizar_listas)
 
 if __name__ == "__main__":
     root = tk.Tk()
-    app = WasapApp(root)
+    app = Wasap(root)
     root.mainloop()
